@@ -74,3 +74,29 @@ body::after {
 
 /* Smooth scrolling on waveform containers */
 .waveform-scroll { scroll-behavior: smooth; }
+
+/* ── Print / PDF styles ─────────────────────────────── */
+@media print {
+  /* Show only the report, hide the app chrome */
+  #app-ui      { display: none !important; }
+  #pdf-report  { display: block !important; }
+
+  /* Remove the scanline overlay */
+  body::after { display: none; }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  /* Prevent awkward page breaks inside tip cards */
+  section        { page-break-inside: avoid; }
+  .tip-card      { page-break-inside: avoid; }
+}
