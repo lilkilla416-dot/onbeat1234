@@ -11,10 +11,10 @@ import type { Beat, VocalHit, AnalysisResult } from '../lib/types';
 ──────────────────────────────────────────────────────── */
 
 const STATUS_COLOR: Record<string, string> = {
-  'in-pocket': '#00ff88',
-  rushed:      '#ff3344',
-  dragged:     '#ffcc00',
-  off:         '#cc4455',
+  'in-pocket': '#34d399',
+  rushed:      '#f87171',
+  dragged:     '#fbbf24',
+  off:         '#4b5563',
 };
 
 const STATUS_SYMBOL: Record<string, string> = {
@@ -50,25 +50,27 @@ interface BeatSlotProps {
 }
 
 function BeatSlot({ hit, isDownbeat, beatNum }: BeatSlotProps) {
-  const color = hit ? STATUS_COLOR[hit.status] : undefined;
+  const color  = hit ? STATUS_COLOR[hit.status] : undefined;
   const symbol = hit ? STATUS_SYMBOL[hit.status] : '·';
+  const isGood = hit?.status === 'in-pocket';
 
   return (
     <div
-      className="flex items-center justify-center text-[11px] font-mono rounded transition-all"
+      className="flex items-center justify-center rounded cursor-default select-none"
       style={{
-        width: isDownbeat ? 22 : 18,
+        width:  isDownbeat ? 22 : 18,
         height: isDownbeat ? 22 : 18,
-        backgroundColor: hit ? (color + '22') : 'rgba(40,40,60,0.4)',
-        border: `1px solid ${hit ? (color + '55') : 'rgba(60,60,80,0.4)'}`,
-        color: hit ? color : '#333355',
-        boxShadow: hit && hit.status !== 'off' ? `0 0 6px ${color}55` : undefined,
-        fontWeight: isDownbeat ? 700 : 400,
+        fontSize: 10,
+        fontFamily: 'var(--font-geist-mono)',
+        fontWeight: isDownbeat ? 600 : 400,
+        backgroundColor: hit ? (color + (isGood ? '28' : '18')) : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${hit ? (color + (isGood ? '55' : '33')) : 'rgba(255,255,255,0.07)'}`,
+        color: hit ? color : 'rgba(255,255,255,0.15)',
+        borderRadius: isDownbeat ? 5 : 4,
       }}
       title={hit
         ? `Beat ${beatNum + 1}  t=${hit.time.toFixed(2)}s  Δ=${hit.offsetMs >= 0 ? '+' : ''}${hit.offsetMs.toFixed(1)}ms  ${STATUS_LABEL[hit.status]}`
-        : `Beat ${beatNum + 1} — no hit`
-      }
+        : `Beat ${beatNum + 1} — no hit`}
     >
       {symbol}
     </div>
@@ -117,35 +119,30 @@ export default function FlowMap({ result, printMode = false }: Props) {
   }
 
   const RHYME = ['A', 'B', 'A', 'B'];
-  const RHYME_COLOR = ['#00ccff', '#ff00cc', '#00ccff', '#ff00cc'];
+  const RHYME_COLOR = ['#818cf8', '#c084fc', '#818cf8', '#c084fc'];
 
   return (
-    <div className={`flex flex-col gap-3 ${printMode ? '' : 'border border-zinc-800 rounded-xl p-4 bg-zinc-950/80 shadow-[0_0_20px_rgba(0,200,255,0.05)]'}`}>
+    <div className={printMode ? 'flex flex-col gap-2' : 'flex flex-col gap-3 rounded-xl p-4 bg-white/[0.03] border border-white/[0.06]'}>
       {!printMode && (
-        <div className="flex items-center justify-between">
-          <div className="text-xs font-mono tracking-widest text-cyan-600 uppercase">
-            ◈ ABAB Flow Map — First 8 Bars
-          </div>
-          <div className="text-[10px] font-mono text-zinc-600">
-            1 cell = 1 beat slot
-          </div>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-white/35 font-medium">ABAB Flow — First 8 Bars</span>
+          <span className="text-[10px] text-white/20"
+            style={{ fontFamily: 'var(--font-geist-mono)' }}>1 cell = 1 beat</span>
         </div>
       )}
 
-      {/* Beat ruler header */}
-      <div className="flex items-center gap-1 ml-10 mb-0.5">
+      {/* Beat ruler */}
+      <div className="flex items-center gap-1 ml-9">
         {[1,2,3,4,1,2,3,4].map((n, i) => (
-          <div key={i}
-            className="text-[8px] font-mono text-zinc-700 text-center"
-            style={{ width: i % 4 === 0 ? 22 : 18 }}>
+          <div key={i} className="text-[8px] text-white/20 text-center"
+            style={{ width: i % 4 === 0 ? 22 : 18, fontFamily: 'var(--font-geist-mono)' }}>
             {n}
           </div>
         ))}
-        <div className="text-[8px] font-mono text-zinc-700 ml-1">|</div>
+        <div className="text-[8px] text-white/15 mx-0.5">|</div>
         {[1,2,3,4,1,2,3,4].map((n, i) => (
-          <div key={i + 8}
-            className="text-[8px] font-mono text-zinc-700 text-center"
-            style={{ width: i % 4 === 0 ? 22 : 18 }}>
+          <div key={i+8} className="text-[8px] text-white/20 text-center"
+            style={{ width: i % 4 === 0 ? 22 : 18, fontFamily: 'var(--font-geist-mono)' }}>
             {n}
           </div>
         ))}
@@ -161,61 +158,57 @@ export default function FlowMap({ result, printMode = false }: Props) {
         const nOff      = hitSlots.filter(s => s.hit!.status === 'off').length;
         const nIn       = hitSlots.filter(s => s.hit!.status === 'in-pocket').length;
         const fix       = lineFix(nRushed, nDragged, nOff, hitSlots.length);
-        const lineAccuracy = hitSlots.length > 0 ? Math.round((nIn / hitSlots.length) * 100) : null;
-        const rhymeColor   = RHYME_COLOR[lineIdx];
+        const lineAcc   = hitSlots.length > 0 ? Math.round((nIn / hitSlots.length) * 100) : null;
+        const rColor    = RHYME_COLOR[lineIdx];
 
         return (
           <div key={lineIdx} className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              {/* Rhyme label */}
-              <div
-                className="w-8 text-center text-xs font-bold font-mono rounded shrink-0"
-                style={{ color: rhymeColor, textShadow: printMode ? undefined : `0 0 8px ${rhymeColor}` }}
-              >
+            <div className="flex items-center gap-1.5">
+              {/* Rhyme badge */}
+              <div className="w-7 text-center text-[11px] font-semibold shrink-0 rounded-md py-0.5"
+                style={{ color: rColor, backgroundColor: rColor + '18',
+                  fontFamily: 'var(--font-geist-mono)' }}>
                 {RHYME[lineIdx]}
               </div>
 
-              {/* Beat grid — first 2 bars */}
+              {/* Beat grid — bars 1-2 */}
               <div className="flex gap-0.5">
                 {slots.slice(0, 8).map(({ beat, hit, isDownbeat, i }) => (
-                  <BeatSlot key={i} hit={hit} isDownbeat={isDownbeat} beatNum={i} barNum={Math.floor(i / 4)} />
+                  <BeatSlot key={i} hit={hit} isDownbeat={isDownbeat} beatNum={i} barNum={0} />
                 ))}
               </div>
 
-              <div className="text-zinc-700 text-xs font-mono">|</div>
+              <div className="text-white/15 text-xs">|</div>
 
-              {/* Beat grid — next 2 bars */}
+              {/* Beat grid — bars 3-4 */}
               <div className="flex gap-0.5">
                 {slots.slice(8).map(({ beat, hit, isDownbeat, i }) => (
-                  <BeatSlot key={i} hit={hit} isDownbeat={isDownbeat} beatNum={i % 4} barNum={Math.floor(i / 4)} />
+                  <BeatSlot key={i} hit={hit} isDownbeat={isDownbeat} beatNum={i % 4} barNum={1} />
                 ))}
               </div>
 
-              {/* Accuracy badge */}
-              {lineAccuracy !== null && (
-                <div
-                  className="ml-2 text-[10px] font-mono shrink-0"
+              {lineAcc !== null && (
+                <span className="ml-2 text-[10px] tabular-nums shrink-0"
                   style={{
-                    color: lineAccuracy >= 70 ? '#00ff88' : lineAccuracy >= 40 ? '#ffcc00' : '#ff3344',
-                  }}
-                >
-                  {lineAccuracy}%
-                </div>
+                    fontFamily: 'var(--font-geist-mono)',
+                    color: lineAcc >= 70 ? '#34d399' : lineAcc >= 40 ? '#fbbf24' : '#f87171',
+                  }}>
+                  {lineAcc}%
+                </span>
               )}
 
-              {/* Mini status pills */}
-              <div className="flex gap-1 ml-1 text-[9px] font-mono shrink-0">
-                {nIn > 0     && <span style={{ color: '#00ff88' }}>✓{nIn}</span>}
-                {nRushed > 0 && <span style={{ color: '#ff3344' }}>◀{nRushed}</span>}
-                {nDragged > 0&& <span style={{ color: '#ffcc00' }}>▶{nDragged}</span>}
-                {nOff > 0    && <span style={{ color: '#cc4455' }}>✕{nOff}</span>}
+              <div className="flex gap-1 ml-0.5 text-[9px] shrink-0"
+                style={{ fontFamily: 'var(--font-geist-mono)' }}>
+                {nIn > 0     && <span style={{ color: '#34d399' }}>{nIn}✓</span>}
+                {nRushed > 0 && <span style={{ color: '#f87171' }}>{nRushed}◀</span>}
+                {nDragged > 0&& <span style={{ color: '#fbbf24' }}>{nDragged}▶</span>}
+                {nOff > 0    && <span style={{ color: '#6b7280' }}>{nOff}✕</span>}
               </div>
             </div>
 
-            {/* Fix suggestion */}
             {fix && (
-              <div className="flex items-start gap-2 ml-10 text-[10px] font-mono text-yellow-500/80 leading-snug">
-                <span className="shrink-0">↺</span>
+              <div className="flex items-start gap-1.5 ml-9 text-[10px] text-amber-400/60 leading-snug">
+                <span className="shrink-0 mt-px">↺</span>
                 <span>{fix}</span>
               </div>
             )}
@@ -223,13 +216,17 @@ export default function FlowMap({ result, printMode = false }: Props) {
         );
       })}
 
-      {/* Legend row */}
-      <div className="flex gap-4 mt-1 ml-10 text-[9px] font-mono text-zinc-600">
-        <span style={{ color: '#00ff88' }}>✓ in pocket</span>
-        <span style={{ color: '#ff3344' }}>◀ rushed</span>
-        <span style={{ color: '#ffcc00' }}>▶ dragged</span>
-        <span style={{ color: '#cc4455' }}>✕ off beat</span>
-        <span>· no hit</span>
+      {/* Legend */}
+      <div className="flex gap-3 mt-1 ml-9 text-[9px] text-white/25 pt-2 border-t border-white/[0.05]">
+        {[
+          { color: '#34d399', label: '✓ in pocket' },
+          { color: '#f87171', label: '◀ rushed' },
+          { color: '#fbbf24', label: '▶ dragged' },
+          { color: '#6b7280', label: '✕ off beat' },
+          { color: 'rgba(255,255,255,0.2)', label: '· no hit' },
+        ].map(({ color, label }) => (
+          <span key={label} style={{ color }}>{label}</span>
+        ))}
       </div>
     </div>
   );

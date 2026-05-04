@@ -1,18 +1,21 @@
 @import "tailwindcss";
 
-/* ── Cyberpunk dark theme ───────────────────────────── */
+/* ── Design tokens ─────────────────────────────────────── */
 :root {
-  --bg:          #050508;
-  --surface:     #0d0d14;
-  --border:      #1a1a2e;
-  --cyan:        #00ccff;
-  --cyan-dim:    #005566;
-  --magenta:     #ff00cc;
-  --green:       #00ff88;
-  --red:         #ff3344;
-  --yellow:      #ffcc00;
-  --text:        #c8c8d8;
-  --text-dim:    #555566;
+  --bg:           #08090d;
+  --surface:      rgba(255,255,255,0.03);
+  --surface-2:    rgba(255,255,255,0.055);
+  --border:       rgba(255,255,255,0.07);
+  --border-2:     rgba(255,255,255,0.13);
+  --text:         #dde1f0;
+  --text-muted:   #5c6380;
+  --text-dim:     #2e3350;
+  --accent:       #818cf8;
+  --accent-soft:  rgba(129,140,248,0.18);
+  --in-pocket:    #34d399;
+  --rushed:       #f87171;
+  --dragged:      #fbbf24;
+  --off:          #4b5563;
 }
 
 @theme inline {
@@ -22,81 +25,69 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Force dark */
-html, body { color-scheme: dark; }
+html, body {
+  color-scheme: dark;
+  height: 100%;
+}
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-geist-mono, 'Courier New', monospace);
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0a12; }
-::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #00ccff33; }
+/* ── Scrollbars ────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: rgba(255,255,255,0.08); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
 
-/* Scanline overlay (subtle) */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.04) 2px,
-    rgba(0,0,0,0.04) 4px
-  );
-  z-index: 9999;
+/* ── Glassmorphism card ────────────────────────────────── */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
 }
 
-/* Neon text helper */
-.neon-cyan {
-  color: var(--cyan);
-  text-shadow: 0 0 8px var(--cyan), 0 0 20px var(--cyan);
+.glass-2 {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
 }
 
-.neon-green {
-  color: var(--green);
-  text-shadow: 0 0 8px var(--green), 0 0 20px var(--green);
+/* ── Subtle fade-in ────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+.fade-up { animation: fade-up 0.3s ease both; }
 
-/* Pulse animation for analysing state */
-@keyframes neon-pulse {
+/* ── Pulse for analysis state ──────────────────────────── */
+@keyframes soft-pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  50%       { opacity: 0.45; }
 }
-.animate-neon-pulse { animation: neon-pulse 1s ease-in-out infinite; }
+.animate-soft-pulse { animation: soft-pulse 1.4s ease-in-out infinite; }
 
-/* Smooth scrolling on waveform containers */
-.waveform-scroll { scroll-behavior: smooth; }
-
-/* ── Print / PDF styles ─────────────────────────────── */
+/* ── Print / PDF ───────────────────────────────────────── */
 @media print {
-  /* Show only the report, hide the app chrome */
-  #app-ui      { display: none !important; }
-  #pdf-report  { display: block !important; }
-
-  /* Remove the scanline overlay */
-  body::after { display: none; }
+  #app-ui     { display: none !important; }
+  #pdf-report { display: block !important; }
 
   body {
     background: #fff !important;
     color: #000 !important;
     font-size: 11pt;
     line-height: 1.5;
+    overflow: visible;
   }
 
-  @page {
-    size: A4;
-    margin: 18mm 16mm;
-  }
+  @page { size: A4; margin: 18mm 16mm; }
 
-  /* Prevent awkward page breaks inside tip cards */
-  section        { page-break-inside: avoid; }
-  .tip-card      { page-break-inside: avoid; }
+  section   { page-break-inside: avoid; }
+  .tip-card { page-break-inside: avoid; }
 }

@@ -12,16 +12,16 @@ interface Tip {
   after?: string;
 }
 
-const SEVERITY_STYLES: Record<string, { border: string; label: string; labelColor: string }> = {
-  critical: { border: '#ff3344',  label: '⚠ CRITICAL',  labelColor: '#ff3344' },
-  warn:     { border: '#ffcc00',  label: '◈ WARNING',   labelColor: '#ffcc00' },
-  info:     { border: '#00ccff',  label: '◉ TIP',       labelColor: '#00ccff' },
+const SEVERITY_META: Record<string, { accent: string; badge: string }> = {
+  critical: { accent: '#f87171', badge: 'Critical' },
+  warn:     { accent: '#fbbf24', badge: 'Warning'  },
+  info:     { accent: '#818cf8', badge: 'Tip'      },
 };
 
-const CATEGORY_ICON: Record<string, string> = {
-  technique: '◎',
-  structure: '⬡',
-  rewrite:   '↺',
+const CATEGORY_LABEL: Record<string, string> = {
+  technique: 'Technique',
+  structure: 'Structure',
+  rewrite:   'Rewrite',
 };
 
 function generateTips(result: AnalysisResult): Tip[] {
@@ -149,9 +149,9 @@ interface Props {
 export default function LyricCoach({ result }: Props) {
   if (!result) {
     return (
-      <div className="flex items-center justify-center h-24 text-zinc-700 font-mono text-xs
-        border border-zinc-800 rounded-lg bg-zinc-950/60">
-        ANALYZE A TRACK TO UNLOCK COACHING
+      <div className="flex items-center justify-center h-24 rounded-xl
+        bg-white/[0.02] border border-white/[0.05] text-sm text-white/20">
+        Analyze a track to unlock coaching
       </div>
     );
   }
@@ -159,60 +159,57 @@ export default function LyricCoach({ result }: Props) {
   const tips = generateTips(result);
 
   return (
-    <div className="flex flex-col gap-3 border border-zinc-800 rounded-xl p-4 bg-zinc-950/80
-      shadow-[0_0_20px_rgba(0,200,255,0.05)]">
+    <div className="flex flex-col gap-4 p-4 rounded-xl bg-white/[0.025] border border-white/[0.06]">
 
       <div className="flex items-center justify-between">
-        <div className="text-xs font-mono tracking-widest text-cyan-600 uppercase">
-          ◈ Lyric Coach — Flow Improvement
-        </div>
-        <div className="text-[10px] font-mono text-zinc-600">
+        <span className="text-xs text-white/35 font-medium">Lyric Coach</span>
+        <span className="text-[11px] text-white/20"
+          style={{ fontFamily: 'var(--font-geist-mono)' }}>
           {tips.length} suggestions
-        </div>
+        </span>
       </div>
 
-      {/* ABAB flow map — always first */}
-      {result.beats.length >= 8 && (
-        <FlowMap result={result} />
-      )}
+      {/* ABAB flow map */}
+      {result.beats.length >= 8 && <FlowMap result={result} />}
 
-      <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
+      {/* Tip cards */}
+      <div className="flex flex-col gap-2 max-h-[440px] overflow-y-auto">
         {tips.map((tip, idx) => {
-          const style = SEVERITY_STYLES[tip.severity];
+          const meta = SEVERITY_META[tip.severity];
           return (
-            <div
-              key={idx}
-              className="rounded-lg p-3 border-l-2 bg-zinc-900/60"
-              style={{ borderLeftColor: style.border }}
+            <div key={idx}
+              className="rounded-xl p-3.5 bg-white/[0.03] border border-white/[0.06]
+                hover:bg-white/[0.045] transition-colors duration-150"
+              style={{ borderLeftWidth: 2, borderLeftColor: meta.accent }}
             >
-              {/* Header row */}
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-[10px] font-mono" style={{ color: style.labelColor }}>
-                  {style.label}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md"
+                  style={{ backgroundColor: meta.accent + '20', color: meta.accent }}>
+                  {meta.badge}
                 </span>
-                <span className="text-[10px] text-zinc-600 font-mono">
-                  {CATEGORY_ICON[tip.category]} {tip.category.toUpperCase()}
+                <span className="text-[10px] text-white/25 font-medium uppercase tracking-wide">
+                  {CATEGORY_LABEL[tip.category]}
                 </span>
               </div>
 
-              <div className="text-sm font-mono text-zinc-200 mb-1.5 leading-snug">
+              <div className="text-sm font-medium text-white/80 mb-1.5 leading-snug">
                 {tip.title}
               </div>
 
-              <div className="text-xs text-zinc-400 leading-relaxed mb-2">
+              <div className="text-xs text-white/45 leading-relaxed">
                 {tip.body}
               </div>
 
-              {/* Before/after rewrite example */}
               {tip.before && tip.after && (
-                <div className="flex flex-col gap-1 mt-2 text-[11px] font-mono">
-                  <div className="flex gap-2 items-start">
-                    <span className="text-red-500 shrink-0">✕</span>
-                    <span className="text-zinc-500 italic">{tip.before}</span>
+                <div className="flex flex-col gap-1 mt-3 rounded-lg overflow-hidden text-[11px]"
+                  style={{ fontFamily: 'var(--font-geist-mono)' }}>
+                  <div className="flex gap-2 items-start px-2.5 py-1.5 bg-red-500/8 border border-red-500/15 rounded-lg">
+                    <span className="text-red-400/70 shrink-0 mt-0.5">✕</span>
+                    <span className="text-white/35 italic">{tip.before}</span>
                   </div>
-                  <div className="flex gap-2 items-start">
-                    <span className="text-green-400 shrink-0">✓</span>
-                    <span className="text-green-300 italic">{tip.after}</span>
+                  <div className="flex gap-2 items-start px-2.5 py-1.5 bg-emerald-500/8 border border-emerald-500/15 rounded-lg">
+                    <span className="text-emerald-400/80 shrink-0 mt-0.5">✓</span>
+                    <span className="text-emerald-300/70 italic">{tip.after}</span>
                   </div>
                 </div>
               )}

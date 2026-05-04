@@ -2,165 +2,116 @@
 
 import type { AnalysisResult } from '../lib/types';
 
-interface Props {
-  result: AnalysisResult | null;
-}
+const MONO = { fontFamily: 'var(--font-geist-mono)' };
 
-function StatBox({ label, value, unit = '', color = '#00ccff', glow = false }: {
-  label: string;
-  value: string | number;
-  unit?: string;
-  color?: string;
-  glow?: boolean;
-}) {
+function Stat({ label, value, unit = '' }: { label: string; value: string | number; unit?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1
-      border border-zinc-800 rounded-lg p-3 bg-zinc-950/80 min-w-[90px]">
-      <div className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-        {label}
-      </div>
-      <div
-        className="text-2xl font-mono font-bold leading-none"
-        style={{
-          color,
-          textShadow: glow ? `0 0 12px ${color}, 0 0 24px ${color}55` : undefined,
-        }}
-      >
+    <div className="flex flex-col gap-1 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+      <div className="text-[10px] text-white/30 uppercase tracking-widest font-medium">{label}</div>
+      <div className="text-xl font-semibold text-white/85 leading-none" style={MONO}>
         {value}
-        <span className="text-sm font-normal ml-0.5 text-zinc-400">{unit}</span>
-      </div>
-    </div>
-  );
-}
-
-function OffsetBar({ avgMs }: { avgMs: number }) {
-  // Map -80..+80 ms to 0..100%
-  const clamped = Math.max(-80, Math.min(80, avgMs));
-  const pct = ((clamped + 80) / 160) * 100;
-  const isRush = clamped < -5;
-  const isDrag = clamped > 5;
-  const color = isRush ? '#ff3344' : isDrag ? '#ffcc00' : '#00ff88';
-
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between text-[10px] font-mono text-zinc-500">
-        <span>◀ RUSHED</span>
-        <span>AVG OFFSET</span>
-        <span>DRAGGED ▶</span>
-      </div>
-      <div className="relative h-3 bg-zinc-900 rounded-full border border-zinc-800 overflow-hidden">
-        {/* Center tick */}
-        <div className="absolute top-0 bottom-0 left-1/2 w-px bg-zinc-600" />
-        {/* Marker */}
-        <div
-          className="absolute top-0.5 bottom-0.5 w-2 rounded-full transition-all duration-500"
-          style={{
-            left: `calc(${pct}% - 4px)`,
-            backgroundColor: color,
-            boxShadow: `0 0 8px ${color}`,
-          }}
-        />
-      </div>
-      <div className="text-center text-xs font-mono" style={{ color }}>
-        {avgMs >= 0 ? '+' : ''}{avgMs.toFixed(1)} ms
+        {unit && <span className="text-sm text-white/30 ml-1 font-normal">{unit}</span>}
       </div>
     </div>
   );
 }
 
 function AccuracyRing({ pct }: { pct: number }) {
-  const r = 36;
+  const r    = 34;
   const circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
-  const color = pct >= 70 ? '#00ff88' : pct >= 40 ? '#ffcc00' : '#ff3344';
+  const color = pct >= 70 ? '#34d399' : pct >= 40 ? '#fbbf24' : '#f87171';
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative w-24 h-24">
-        <svg width="96" height="96" className="rotate-[-90deg]">
-          <circle cx="48" cy="48" r={r} fill="none" stroke="#1a1a2e" strokeWidth="8" />
-          <circle
-            cx="48" cy="48" r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth="8"
-            strokeDasharray={`${dash} ${circ}`}
-            strokeLinecap="round"
-            style={{
-              filter: `drop-shadow(0 0 6px ${color})`,
-              transition: 'stroke-dasharray 0.6s ease',
-            }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-mono font-bold" style={{ color, textShadow: `0 0 10px ${color}` }}>
-            {pct}%
-          </span>
-          <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">pocket</span>
-        </div>
+    <div className="relative w-[88px] h-[88px] shrink-0">
+      <svg width="88" height="88" className="rotate-[-90deg]">
+        <circle cx="44" cy="44" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="7"/>
+        <circle cx="44" cy="44" r={r} fill="none"
+          stroke={color} strokeWidth="7"
+          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+          style={{ transition: 'stroke-dasharray 0.7s cubic-bezier(0.4,0,0.2,1)' }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-lg font-semibold leading-none" style={{ ...MONO, color }}>{pct}%</span>
+        <span className="text-[9px] text-white/30 mt-0.5 uppercase tracking-widest">pocket</span>
       </div>
     </div>
   );
 }
 
-export default function MetricsPanel({ result }: Props) {
+function OffsetBar({ avgMs }: { avgMs: number }) {
+  const clamped = Math.max(-80, Math.min(80, avgMs));
+  const pct     = ((clamped + 80) / 160) * 100;
+  const color   = clamped < -5 ? '#f87171' : clamped > 5 ? '#fbbf24' : '#34d399';
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex justify-between text-[10px] text-white/25 font-medium">
+        <span>Rushed</span>
+        <span className="text-white/45" style={MONO}>
+          {avgMs >= 0 ? '+' : ''}{avgMs.toFixed(1)} ms avg
+        </span>
+        <span>Dragged</span>
+      </div>
+      <div className="relative h-2 rounded-full bg-white/[0.05] overflow-hidden">
+        <div className="absolute inset-y-0 left-1/2 w-px bg-white/10" />
+        <div className="absolute top-0.5 bottom-0.5 w-2.5 -ml-1.5 rounded-full transition-all duration-500"
+          style={{ left: `${pct}%`, backgroundColor: color }} />
+      </div>
+    </div>
+  );
+}
+
+export default function MetricsPanel({ result }: { result: AnalysisResult | null }) {
   if (!result) {
     return (
-      <div className="flex items-center justify-center h-32 text-zinc-700 font-mono text-sm
-        border border-zinc-800 rounded-lg bg-zinc-950/60">
-        LOAD TRACKS TO SEE METRICS
+      <div className="flex items-center justify-center h-32 rounded-xl
+        bg-white/[0.02] border border-white/[0.05] text-sm text-white/20">
+        Load tracks to see metrics
       </div>
     );
   }
 
-  const inPocket  = result.vocalHits.filter(h => h.status === 'in-pocket').length;
-  const rushed    = result.vocalHits.filter(h => h.status === 'rushed').length;
-  const dragged   = result.vocalHits.filter(h => h.status === 'dragged').length;
-  const off       = result.vocalHits.filter(h => h.status === 'off').length;
-  const total     = result.vocalHits.length;
+  const inPocket = result.vocalHits.filter(h => h.status === 'in-pocket').length;
+  const rushed   = result.vocalHits.filter(h => h.status === 'rushed').length;
+  const dragged  = result.vocalHits.filter(h => h.status === 'dragged').length;
+  const off      = result.vocalHits.filter(h => h.status === 'off').length;
+  const total    = result.vocalHits.length;
 
   return (
-    <div className="flex flex-col gap-4 border border-zinc-800 rounded-xl p-4 bg-zinc-950/80
-      shadow-[0_0_20px_rgba(0,200,255,0.05)]">
+    <div className="flex flex-col gap-4 p-4 rounded-xl bg-white/[0.025]
+      border border-white/[0.06]">
 
-      {/* Header */}
-      <div className="text-xs font-mono tracking-widest text-cyan-600 uppercase">
-        ◈ Analysis Metrics
-      </div>
+      <div className="text-xs text-white/35 font-medium">Analysis</div>
 
-      {/* Top row */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex gap-3 items-center">
         <AccuracyRing pct={result.accuracy} />
-
-        <div className="flex flex-wrap gap-2 flex-1">
-          <StatBox label="BPM" value={result.bpm.toFixed(1)} color="#00ccff" glow />
-          <StatBox label="Beats" value={result.beats.length} color="#8888ff" />
-          <StatBox label="Hits" value={total} color="#ff88cc" />
-          <StatBox label="Pocket ±" value={result.pocketWindow} unit="ms" color="#00ff88" />
+        <div className="grid grid-cols-2 gap-2 flex-1">
+          <Stat label="BPM"    value={result.bpm.toFixed(1)} />
+          <Stat label="Beats"  value={result.beats.length} />
+          <Stat label="Hits"   value={total} />
+          <Stat label="Window" value={result.pocketWindow} unit="ms" />
         </div>
       </div>
 
-      {/* Breakdown pills */}
-      <div className="flex flex-wrap gap-2 text-xs font-mono">
+      {/* Status breakdown */}
+      <div className="grid grid-cols-4 gap-1.5 text-xs">
         {[
-          { label: 'IN POCKET', count: inPocket, color: '#00ff88', bg: 'rgba(0,255,136,0.1)' },
-          { label: 'RUSHED',    count: rushed,   color: '#ff3344', bg: 'rgba(255,51,68,0.1)' },
-          { label: 'DRAGGED',   count: dragged,  color: '#ffcc00', bg: 'rgba(255,204,0,0.1)' },
-          { label: 'OFF',       count: off,      color: '#555566', bg: 'rgba(80,80,100,0.1)' },
-        ].map(({ label, count, color, bg }) => (
-          <div
-            key={label}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
-            style={{ color, borderColor: color + '44', backgroundColor: bg }}
-          >
-            <span className="font-bold">{count}</span>
-            <span className="opacity-70">{label}</span>
+          { label: 'In Pocket', count: inPocket, color: '#34d399' },
+          { label: 'Rushed',    count: rushed,   color: '#f87171' },
+          { label: 'Dragged',   count: dragged,  color: '#fbbf24' },
+          { label: 'Off',       count: off,      color: '#4b5563' },
+        ].map(({ label, count, color }) => (
+          <div key={label}
+            className="flex flex-col items-center gap-0.5 py-2 rounded-lg bg-white/[0.03] border border-white/[0.05]">
+            <span className="text-sm font-semibold" style={{ ...MONO, color }}>{count}</span>
+            <span className="text-[9px] text-white/30 text-center leading-tight">{label}</span>
           </div>
         ))}
       </div>
 
-      {/* Avg offset bar */}
-      <OffsetBar avgMs={result.avgOffsetMs} />
+      {total > 0 && <OffsetBar avgMs={result.avgOffsetMs} />}
     </div>
   );
 }
