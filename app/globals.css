@@ -1,21 +1,29 @@
 @import "tailwindcss";
 
-/* ── Design tokens ─────────────────────────────────────── */
+/* ── Real surface colors — no opacity tricks ───────────── */
 :root {
-  --bg:           #08090d;
-  --surface:      rgba(255,255,255,0.03);
-  --surface-2:    rgba(255,255,255,0.055);
-  --border:       rgba(255,255,255,0.07);
-  --border-2:     rgba(255,255,255,0.13);
-  --text:         #dde1f0;
-  --text-muted:   #5c6380;
-  --text-dim:     #2e3350;
-  --accent:       #818cf8;
-  --accent-soft:  rgba(129,140,248,0.18);
-  --in-pocket:    #34d399;
-  --rushed:       #f87171;
-  --dragged:      #fbbf24;
-  --off:          #4b5563;
+  --bg:       #090a0f;    /* deepest: page background */
+  --s1:       #0d0f1a;    /* surface 1: panels */
+  --s2:       #12152a;    /* surface 2: cards */
+  --s3:       #181b32;    /* surface 3: hover/active */
+  --b1:       #1c2038;    /* border subtle */
+  --b2:       #252948;    /* border visible */
+  --b3:       #303460;    /* border focus */
+
+  --text:     #dde1f2;
+  --text-2:   #7278a0;
+  --text-3:   #3a3f60;
+
+  --accent:   #6366f1;
+  --accent-2: #818cf8;
+  --green:    #10b981;
+  --red:      #ef4444;
+  --amber:    #f59e0b;
+  --slate:    #475569;
+
+  /* waveform track colors */
+  --beat-c:   #3b82f6;
+  --vocal-c:  #a855f7;
 }
 
 @theme inline {
@@ -25,53 +33,28 @@
   --font-mono: var(--font-geist-mono);
 }
 
-html, body {
-  color-scheme: dark;
-  height: 100%;
-}
+html, body { color-scheme: dark; height: 100%; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-geist-sans, system-ui, sans-serif);
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  overflow: hidden;
 }
 
 /* ── Scrollbars ────────────────────────────────────────── */
-::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar          { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track    { background: transparent; }
-::-webkit-scrollbar-thumb    { background: rgba(255,255,255,0.08); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+::-webkit-scrollbar-thumb    { background: var(--b2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--b3); }
 
-/* ── Glassmorphism card ────────────────────────────────── */
-.glass {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-}
-
-.glass-2 {
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: 12px;
-  backdrop-filter: blur(16px);
-}
-
-/* ── Subtle fade-in ────────────────────────────────────── */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.fade-up { animation: fade-up 0.3s ease both; }
-
-/* ── Pulse for analysis state ──────────────────────────── */
+/* ── Pulse for loading ─────────────────────────────────── */
 @keyframes soft-pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
+  50%       { opacity: 0.4; }
 }
-.animate-soft-pulse { animation: soft-pulse 1.4s ease-in-out infinite; }
+.animate-soft-pulse { animation: soft-pulse 1.6s ease-in-out infinite; }
 
 /* ── Print / PDF ───────────────────────────────────────── */
 @media print {
@@ -87,7 +70,5 @@ body {
   }
 
   @page { size: A4; margin: 18mm 16mm; }
-
-  section   { page-break-inside: avoid; }
-  .tip-card { page-break-inside: avoid; }
+  section, .tip-card { page-break-inside: avoid; }
 }

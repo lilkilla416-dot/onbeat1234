@@ -146,11 +146,13 @@ interface Props {
   result: AnalysisResult | null;
 }
 
+const MONO = { fontFamily: 'var(--font-geist-mono)' };
+
 export default function LyricCoach({ result }: Props) {
   if (!result) {
     return (
-      <div className="flex items-center justify-center h-24 rounded-xl
-        bg-white/[0.02] border border-white/[0.05] text-sm text-white/20">
+      <div className="flex items-center justify-center h-24 rounded-xl text-sm"
+        style={{ background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--text-3)' }}>
         Analyze a track to unlock coaching
       </div>
     );
@@ -159,57 +161,62 @@ export default function LyricCoach({ result }: Props) {
   const tips = generateTips(result);
 
   return (
-    <div className="flex flex-col gap-4 p-4 rounded-xl bg-white/[0.025] border border-white/[0.06]">
+    <div className="flex flex-col gap-4 p-4 rounded-xl"
+      style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-white/35 font-medium">Lyric Coach</span>
-        <span className="text-[11px] text-white/20"
-          style={{ fontFamily: 'var(--font-geist-mono)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--text-2)' }}>Lyric Coach</span>
+        <span className="text-[11px]" style={{ color: 'var(--text-3)', ...MONO }}>
           {tips.length} suggestions
         </span>
       </div>
 
-      {/* ABAB flow map */}
       {result.beats.length >= 8 && <FlowMap result={result} />}
 
-      {/* Tip cards */}
       <div className="flex flex-col gap-2 max-h-[440px] overflow-y-auto">
         {tips.map((tip, idx) => {
           const meta = SEVERITY_META[tip.severity];
           return (
             <div key={idx}
-              className="rounded-xl p-3.5 bg-white/[0.03] border border-white/[0.06]
-                hover:bg-white/[0.045] transition-colors duration-150"
-              style={{ borderLeftWidth: 2, borderLeftColor: meta.accent }}
+              className="rounded-xl p-3.5 transition-colors duration-150"
+              style={{
+                background: 'var(--s2)',
+                border: '1px solid var(--b1)',
+                borderLeftWidth: 2,
+                borderLeftColor: meta.accent,
+              }}
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md"
                   style={{ backgroundColor: meta.accent + '20', color: meta.accent }}>
                   {meta.badge}
                 </span>
-                <span className="text-[10px] text-white/25 font-medium uppercase tracking-wide">
+                <span className="text-[10px] font-medium uppercase tracking-wide"
+                  style={{ color: 'var(--text-3)' }}>
                   {CATEGORY_LABEL[tip.category]}
                 </span>
               </div>
 
-              <div className="text-sm font-medium text-white/80 mb-1.5 leading-snug">
+              <div className="text-sm font-medium mb-1.5 leading-snug" style={{ color: 'var(--text)' }}>
                 {tip.title}
               </div>
 
-              <div className="text-xs text-white/45 leading-relaxed">
+              <div className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>
                 {tip.body}
               </div>
 
               {tip.before && tip.after && (
                 <div className="flex flex-col gap-1 mt-3 rounded-lg overflow-hidden text-[11px]"
-                  style={{ fontFamily: 'var(--font-geist-mono)' }}>
-                  <div className="flex gap-2 items-start px-2.5 py-1.5 bg-red-500/8 border border-red-500/15 rounded-lg">
-                    <span className="text-red-400/70 shrink-0 mt-0.5">✕</span>
-                    <span className="text-white/35 italic">{tip.before}</span>
+                  style={MONO}>
+                  <div className="flex gap-2 items-start px-2.5 py-1.5 rounded-lg"
+                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                    <span className="shrink-0 mt-0.5" style={{ color: 'rgba(248,113,113,0.7)' }}>✕</span>
+                    <span className="italic" style={{ color: 'var(--text-2)' }}>{tip.before}</span>
                   </div>
-                  <div className="flex gap-2 items-start px-2.5 py-1.5 bg-emerald-500/8 border border-emerald-500/15 rounded-lg">
-                    <span className="text-emerald-400/80 shrink-0 mt-0.5">✓</span>
-                    <span className="text-emerald-300/70 italic">{tip.after}</span>
+                  <div className="flex gap-2 items-start px-2.5 py-1.5 rounded-lg"
+                    style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)' }}>
+                    <span className="shrink-0 mt-0.5" style={{ color: 'rgba(52,211,153,0.8)' }}>✓</span>
+                    <span className="italic" style={{ color: '#6ee7b7' }}>{tip.after}</span>
                   </div>
                 </div>
               )}
@@ -221,6 +228,5 @@ export default function LyricCoach({ result }: Props) {
   );
 }
 
-// Export the pure generator so AnalysisReport can call it server-side / print
 export { generateTips };
 export type { Tip };
