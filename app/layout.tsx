@@ -1,23 +1,24 @@
-import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
-});
+  variable: "--font-inter",
+  weight: ["400", "600", "700", "900"],
+})
 
 export const metadata: Metadata = {
-  title: "On Beat // Rhythm Analyzer",
-  description: "DSP-powered pocket detection — analyze BPM, timing groove and vocal accuracy against the beat.",
-};
+  title: "Artist Launchpad",
+  description: "Build your professional artist landing page in minutes.",
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistMono.variable} h-full`}>
-      <body className="h-full overflow-hidden bg-[#050508]">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full`}>
+      <body className="h-full overflow-hidden" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
+        {children}
+      </body>
     </html>
-  );
+  )
 }

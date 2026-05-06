@@ -1,102 +1,37 @@
 @import "tailwindcss";
 
-/* ── Cyberpunk dark theme ───────────────────────────── */
 :root {
-  --bg:          #050508;
-  --surface:     #0d0d14;
-  --border:      #1a1a2e;
-  --cyan:        #00ccff;
-  --cyan-dim:    #005566;
-  --magenta:     #ff00cc;
-  --green:       #00ff88;
-  --red:         #ff3344;
-  --yellow:      #ffcc00;
-  --text:        #c8c8d8;
-  --text-dim:    #555566;
+  --bg:        #080810;
+  --surface:   #0e0e1a;
+  --border:    #1c1c30;
+  --purple:    #6c63ff;
+  --pink:      #ff3cac;
+  --gold:      #ffd700;
+  --text:      #e2e2f0;
+  --text-dim:  #4a4a6a;
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-/* Force dark */
-html, body { color-scheme: dark; }
+html, body {
+  color-scheme: dark;
+  height: 100%;
+}
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-geist-mono, 'Courier New', monospace);
   overflow: hidden;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0a12; }
-::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #00ccff33; }
+::-webkit-scrollbar         { width: 4px; height: 4px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: #1c1c30; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #6c63ff44; }
 
-/* Scanline overlay (subtle) */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.04) 2px,
-    rgba(0,0,0,0.04) 4px
-  );
-  z-index: 9999;
-}
-
-/* Neon text helper */
-.neon-cyan {
-  color: var(--cyan);
-  text-shadow: 0 0 8px var(--cyan), 0 0 20px var(--cyan);
-}
-
-.neon-green {
-  color: var(--green);
-  text-shadow: 0 0 8px var(--green), 0 0 20px var(--green);
-}
-
-/* Pulse animation for analysing state */
-@keyframes neon-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-.animate-neon-pulse { animation: neon-pulse 1s ease-in-out infinite; }
-
-/* Smooth scrolling on waveform containers */
-.waveform-scroll { scroll-behavior: smooth; }
-
-/* ── Print / PDF styles ─────────────────────────────── */
 @media print {
-  /* Show only the report, hide the app chrome */
-  #app-ui      { display: none !important; }
-  #pdf-report  { display: block !important; }
-
-  /* Remove the scanline overlay */
-  body::after { display: none; }
-
-  body {
-    background: #fff !important;
-    color: #000 !important;
-    font-size: 11pt;
-    line-height: 1.5;
-  }
-
-  @page {
-    size: A4;
-    margin: 18mm 16mm;
-  }
-
-  /* Prevent awkward page breaks inside tip cards */
-  section        { page-break-inside: avoid; }
-  .tip-card      { page-break-inside: avoid; }
+  body { background: #fff !important; color: #000 !important; }
 }
