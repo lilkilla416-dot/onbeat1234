@@ -1,5 +1,5 @@
-import ArtistLaunchpad from "../components/ArtistLaunchpad"
+import RhythmAnalyzer from "../components/RhythmAnalyzer";
 
 export default function Home() {
-  return <ArtistLaunchpad />
+  return <RhythmAnalyzer />;
 }
