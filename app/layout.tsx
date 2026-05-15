@@ -9,16 +9,15 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Artist Launchpad",
-  description: "Build your professional artist landing page in minutes.",
+  title: "The Drop Desk — Label Agent Team",
+  description:
+    "Upload your cover art, track, and press kit, connect TikTok, and brief five specialist marketing agents.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="h-full overflow-hidden" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
-        {children}
-      </body>
+    <html lang="en" className={inter.variable}>
+      <body>{children}</body>
     </html>
   )
 }

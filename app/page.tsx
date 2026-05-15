@@ -1,5 +1,5 @@
-import ArtistLaunchpad from "../components/ArtistLaunchpad"
+import AgentDashboard from "../components/AgentDashboard"
 
 export default function Home() {
-  return <ArtistLaunchpad />
+  return <AgentDashboard />
 }
